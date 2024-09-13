@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + Vue + TS</title>
+    <script type="module">
+      // 引入 module
+      import all, { register }  from "./dist/index.js";
+      // import all, { register }  from "./src/main.ts";
+      const { PreviewImage } = all;
+      console.log(register, all)
+      register()
+      // // 註冊 web component
+      // register('preview-image', PreviewImage);
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <preview-image src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*nWN7410rjxyX9V3w-KeGeA.png"></preview-image>
+  </body>
+</html>
