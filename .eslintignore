@@ -1,0 +1,11 @@
+/build/
+/config/
+/dist/
+/public/
+/test/unit/coverage/
+/src/assets/
+/src/external/
+
+.vscode
+.idea
+.git

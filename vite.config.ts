@@ -1,7 +1,7 @@
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import dts from "vite-plugin-dts";
-import { fileURLToPath } from "url";
+import { defineConfig } from "vite"
+import vue from "@vitejs/plugin-vue"
+import dts from "vite-plugin-dts"
+import { fileURLToPath } from "url"
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -27,10 +27,24 @@ export default defineConfig({
   ],
   resolve: {
     alias: [
-      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
-      { find: 'Utils', replacement: fileURLToPath(new URL('./src/utils', import.meta.url)) },
-      { find: 'Components', replacement: fileURLToPath(new URL('./src/components', import.meta.url)) },
-      { find: 'Types', replacement: fileURLToPath(new URL('./src/types', import.meta.url)) },
-    ]
+      {
+        find: "@",
+        replacement: fileURLToPath(new URL("./src", import.meta.url)),
+      },
+      {
+        find: "Utils",
+        replacement: fileURLToPath(new URL("./src/utils", import.meta.url)),
+      },
+      {
+        find: "Components",
+        replacement: fileURLToPath(
+          new URL("./src/components", import.meta.url)
+        ),
+      },
+      {
+        find: "Types",
+        replacement: fileURLToPath(new URL("./src/types", import.meta.url)),
+      },
+    ],
   },
-});
+})

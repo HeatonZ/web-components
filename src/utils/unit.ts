@@ -147,15 +147,15 @@ export const PRESETS: Record<
       weight: 0.01,
     },
   },
-};
+}
 export const formatValueString = (
   value: string = ""
 ): [number, string | undefined] => {
-  value = value.trim();
-  const val = /^-?[0-9]\d*\.?\d*/.exec(value)?.[0];
-  const unit = /(?=\S)(\D+)$/.exec(value)?.[0];
-  return [Number(val), unit];
-};
+  value = value.trim()
+  const val = /^-?[0-9]\d*\.?\d*/.exec(value)?.[0]
+  const unit = /(?=\S)(\D+)$/.exec(value)?.[0]
+  return [Number(val), unit]
+}
 
 export const formatNumberValue = (
   value: string,
@@ -163,27 +163,27 @@ export const formatNumberValue = (
   presetItem?: Record<string, PresetItem>, 
   _preset?: string,
 ): number => {
-  const [val, unit] = formatValueString(value);
+  const [val, unit] = formatValueString(value)
   if (unit === output) {
-    return val;
+    return val
   }
   if (!unit) {
-    return val;
+    return val
   }
   const presetKey =
     _preset ||
-    Object.keys(PRESETS).find((p: string) => PRESETS[p][unit.toLowerCase()]);
+    Object.keys(PRESETS).find((p: string) => PRESETS[p][unit.toLowerCase()])
 
-  const preset = presetItem || PRESETS[presetKey || ""] || {};  
+  const preset = presetItem || PRESETS[presetKey || ""] || {}  
   if (!PRESETS[presetKey || ""]) {
-    console.warn(`not support preset ${value}`);
+    console.warn(`not support preset ${value}`)
   }
   if (!preset[unit.toLowerCase()] || !preset[output.toLowerCase()]) {
-    return val || 0;
+    return val || 0
   }
   const ratio =
     new Decimal(preset[unit.toLowerCase()]?.weight)
       .dividedBy(preset[output.toLowerCase()]?.weight || 1)
-      .toNumber() || 1;
-  return new Decimal(val || 0).times(ratio).toNumber();
-};
+      .toNumber() || 1
+  return new Decimal(val || 0).times(ratio).toNumber()
+}
