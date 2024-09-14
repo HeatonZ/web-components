@@ -51,8 +51,7 @@ push:
 	git status; \
 	git add .; \
 	git commit -m "$$commit_msg"; \
-	git push \
-	
+	git push; \
 	if echo $$commit_msg | grep -q "<publish-pack>"; then \
 		version=grep -Eo "$(version_reg)" package.json -m 1 \
 		echo "new version is 1: $$version"; \
