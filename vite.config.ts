@@ -15,6 +15,7 @@ export default defineConfig({
       fileName: "index",
       name: "LIB",
     },
+    target: ["es2015"]
   },
   plugins: [
     vue(),
