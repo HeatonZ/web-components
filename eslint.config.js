@@ -34,6 +34,7 @@ export default [
   {
     files: ["**/*.{ts,vue}"],
     rules: {
+      '@typescript-eslint/no-unused-expressions': 0,
       'no-undef': 'off'
     },
   },

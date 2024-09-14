@@ -15,10 +15,10 @@ export default Components
 
 export function register(key?: string, component?: CustomElementConstructor) {
   if (key && component) {
-    customElements.define(key, component)
+    customElements.get(key) || customElements.define(key, component)
   } else {
     Object.keys(Components).forEach((key) => {
-      customElements.define(kebabCase(key), Components[key])
+      customElements.get(kebabCase(key)) || customElements.define(kebabCase(key), Components[key])
     })
   }
 }
