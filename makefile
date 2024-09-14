@@ -29,7 +29,7 @@ define tag_delete_single
 endef
 
 define tag_all
-  @$(call tag_single,web-components,$(1))
+	echo 'none'
 endef
 
 define tag_delete_all
@@ -51,7 +51,8 @@ push:
 	git status; \
 	git add .; \
 	git commit -m "$$commit_msg"; \
-	git push
+	git push \
+  	@$(call tag_single,web-components,$(1))
 
 build:
 	@$(call build_single,web-components,dynamicResource)
