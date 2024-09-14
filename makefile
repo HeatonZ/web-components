@@ -52,7 +52,7 @@ push:
 	git add .; \
 	git commit -m "$$commit_msg"; \
 	git push \
-  	@$(call tag_single,web-components,$(1))
+  	@$(call tag_single,web-components,$version)
 
 build:
 	@$(call build_single,web-components,dynamicResource)
