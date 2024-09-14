@@ -45,14 +45,19 @@ push:
 		version=$$(echo $$commit_msg | grep -oE $(version_reg)); \
 		echo "new version is: $$version"; \
 		sed -i -E 's/"version": "'$(version_reg)'"/"version": "'$$version'"/' ./package.json; \
-    make V=$$version tag_all; \
+    	make V=$$version tag_all; \
 	fi; \
 	git pull origin master; \
 	git status; \
 	git add .; \
 	git commit -m "$$commit_msg"; \
 	git push \
-  	@$(call tag_single,web-components,$version)
+	
+	if echo $$commit_msg | grep -q "<publish-pack>"; then \
+		version=grep -Eo "$(version_reg)" package.json -m 1 \
+		echo "new version is 1: $$version"; \
+  		@$(call tag_single,web-components,$$version)\
+	fi; \
 
 build:
 	@$(call build_single,web-components,dynamicResource)
