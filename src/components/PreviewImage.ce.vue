@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
 
-const props = defineProps<{ src: string }>()
-const curSrc = ref(props.src)
+const props = defineProps<{ src: string, requestInit?:RequestInit }>()
 const ok = ref(false)
 onBeforeMount(() => {
-  if (!curSrc.value) return
-  fetch(curSrc.value, { method: 'HEAD' }).then((res: Response) => {
+  if (!props.src) return
+  fetch(props.src, { method: 'HEAD', ...props.requestInit }).then((res: Response) => {
     ok.value = res.ok
   }).catch(() => {
     ok.value = false
@@ -15,7 +14,7 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <img v-if="ok" v-bind="$attrs" :src="curSrc" />
+  <img v-if="ok" v-bind="$attrs" :src />
 </template>
 
 <style scoped>

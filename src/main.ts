@@ -1,17 +1,20 @@
 import { defineCustomElement } from 'vue'
 import {kebabCase} from 'lodash'
-import PreviewImageVue from './components/PreviewImage.ce.vue'
+import PreviewImageVue from 'Components/PreviewImage.ce.vue'
+import NumberUnitVue from 'Components/NumberUnit.vue'
 
 const PreviewImage = defineCustomElement(PreviewImageVue)
+const NumberUnit = defineCustomElement(NumberUnitVue)
 
 const Components: Record<string, ReturnType<typeof defineCustomElement>> = {
-    PreviewImage
+    PreviewImage,
+    NumberUnit
 }
 
 export default Components
 
-export function register (key: string, component: CustomElementConstructor) {
-    if(key){
+export function register (key?: string, component?: CustomElementConstructor) {
+    if(key && component){
         customElements.define(key, component)
     }else{
         Object.keys(Components).forEach(key => {
