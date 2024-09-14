@@ -51,15 +51,15 @@ push:
 	git status; \
 	git add .; \
 	git commit -m "$$commit_msg"; \
-	git push; \
+	# git push; \
 	if echo $$commit_msg | grep -q "<publish-pack>"; then \
-		version=grep -Eo "$(version_reg)" package.json -m 1 \
+		version=$$(echo $$commit_msg | grep -oE $(version_reg));  \
 		echo "new version is 1: $$version"; \
-  		make tag_single web-components $$version; \
+  		make tag_single DIR=web-components V=$$version; \
 	fi;
 
 build:
-	@$(call build_single,web-components,dynamicResource)
+	@$(call build_single,web-components)
 
 
 tag_all:
@@ -67,3 +67,6 @@ tag_all:
 
 tag_delete_all:
 	@$(call tag_delete_all,$(DELETE_TAG))
+
+tag_single:
+	@$(call tag_single,$(DIR),$(V))
