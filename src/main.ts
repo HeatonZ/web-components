@@ -1,7 +1,7 @@
 import { defineCustomElement } from "vue"
 import { kebabCase } from "lodash"
 import PreviewImageVue from "Components/PreviewImage.ce.vue"
-import NumberUnitVue from "Components/NumberUnit.vue"
+import NumberUnitVue from "Components/NumberUnit.ce.vue"
 
 const PreviewImage = defineCustomElement(PreviewImageVue)
 const NumberUnit = defineCustomElement(NumberUnitVue)
