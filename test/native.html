@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Components 测试套件</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .test-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .test-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+    }
+
+    .test-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .test-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .test-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-pass {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-fail {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .test-content {
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .log-section {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .log-header {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    .log-content {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: "Courier New", monospace;
+      font-size: 0.9rem;
+    }
+
+    .log-entry {
+      padding: 0.25rem 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .log-pass { color: #28a745; }
+    .log-fail { color: #dc3545; }
+    .log-info { color: #17a2b8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Web Components 测试套件</h1>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="total-tests">0</div>
+        <div class="stat-label">总测试数</div>
+  </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color: #28a745;" id="passed-tests">0</div>
+        <div class="stat-label">通过</div>
+    </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color: #dc3545;" id="failed-tests">0</div>
+        <div class="stat-label">失败</div>
+    </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color: #667eea;" id="pass-rate">0%</div>
+        <div class="stat-label">通过率</div>
+  </div>
+    </div>
+    
+    <div class="test-grid" id="test-grid"></div>
+
+    <div class="log-section">
+      <div class="log-header">📋 测试日志</div>
+      <div class="log-content" id="log-content"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // 优雅的模块导入
+    import * as WebComponents from '../dist/iife/index.js'
+    
+    // 测试统计
+    const stats = {
+      total: 0,
+      passed: 0,
+      failed: 0
+    }
+
+    // 日志记录
+    function log(message, type = 'info') {
+      const logContent = document.getElementById('log-content')
+      const entry = document.createElement('div')
+      entry.className = `log-entry log-${type}`
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`
+      logContent.appendChild(entry)
+      logContent.scrollTop = logContent.scrollHeight
+      console.log(message)
+    }
+
+    // 更新统计
+    function updateStats() {
+      document.getElementById('total-tests').textContent = stats.total
+      document.getElementById('passed-tests').textContent = stats.passed
+      document.getElementById('failed-tests').textContent = stats.failed
+      const rate = stats.total > 0 ? Math.round((stats.passed / stats.total) * 100) : 0
+      document.getElementById('pass-rate').textContent = `${rate}%`
+    }
+
+    // 创建测试卡片
+    function createTestCard(title, testFn) {
+      const card = document.createElement('div')
+      card.className = 'test-card'
+      
+      const header = document.createElement('div')
+      header.className = 'test-header'
+      
+      const titleEl = document.createElement('div')
+      titleEl.className = 'test-title'
+      titleEl.textContent = title
+      
+      const status = document.createElement('span')
+      status.className = 'test-status status-pending'
+      status.textContent = '执行中...'
+      
+      header.appendChild(titleEl)
+      header.appendChild(status)
+      
+      const content = document.createElement('div')
+      content.className = 'test-content'
+      
+      card.appendChild(header)
+      card.appendChild(content)
+      
+      return { card, status, content }
+    }
+
+    // 运行测试
+    async function runTest(title, testFn) {
+      stats.total++
+      updateStats()
+      
+      log(`开始测试: ${title}`, 'info')
+      const { card, status, content } = createTestCard(title, testFn)
+      document.getElementById('test-grid').appendChild(card)
+      
+      try {
+        await testFn(content)
+        stats.passed++
+        status.className = 'test-status status-pass'
+        status.textContent = '✓ 通过'
+        log(`✓ ${title} - 通过`, 'pass')
+      } catch (error) {
+        stats.failed++
+        status.className = 'test-status status-fail'
+        status.textContent = '✗ 失败'
+        log(`✗ ${title} - 失败: ${error.message}`, 'fail')
+        content.innerHTML = `<div style="color: #dc3545; font-size: 0.9rem;">${error.message}</div>`
+      }
+      
+      updateStats()
+    }
+
+    // Base64 编码的 SVG 图片
+    const testImage1 = 'data:image/svg+xml;base64,' + btoa(`
+      <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" fill="#0099ff"/>
+        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" 
+              fill="white" font-size="20" font-family="Arial">Test 1</text>
+      </svg>
+    `)
+
+    const testImage2 = 'data:image/svg+xml;base64,' + btoa(`
+      <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" fill="#ff6b6b"/>
+        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" 
+              fill="white" font-size="20" font-family="Arial">Test 2</text>
+      </svg>
+    `)
+
+    // 等待组件加载
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    // 测试套件
+    log('🚀 开始执行测试套件', 'info')
+    log(`已加载组件: ${Object.keys(WebComponents).join(', ')}`, 'info')
+
+    // 测试 1: PreviewImage - Data URL
+    await runTest('PreviewImage - Data URL', async (content) => {
+      const img = document.createElement('preview-image')
+      img.setAttribute('src', testImage1)
+      img.setAttribute('alt', 'Test Image 1')
+      img.style.maxWidth = '100%'
+      img.style.height = 'auto'
+      content.appendChild(img)
+      
+      await new Promise(resolve => setTimeout(resolve, 200))
+      if (!content.querySelector('img')) {
+        throw new Error('图片未加载')
+      }
+    })
+
+    // 测试 2: PreviewImage - 本地图片
+    await runTest('PreviewImage - 本地图片', async (content) => {
+      const img = document.createElement('preview-image')
+      img.setAttribute('src', './images/test-image.svg')
+      img.setAttribute('alt', 'Local Image')
+      img.style.maxWidth = '100%'
+      content.appendChild(img)
+      
+      await new Promise(resolve => setTimeout(resolve, 200))
+      if (!content.querySelector('img')) {
+        throw new Error('本地图片未加载')
+      }
+    })
+
+    // 测试 3: PreviewImage - 错误处理
+    await runTest('PreviewImage - 错误处理', async (content) => {
+      const img = document.createElement('preview-image')
+      img.setAttribute('src', 'https://invalid-url-that-does-not-exist.com/image.jpg')
+      content.appendChild(img)
+      
+      await new Promise(resolve => setTimeout(resolve, 500))
+      if (content.querySelector('img')) {
+        throw new Error('应该不显示无效图片')
+      }
+      content.innerHTML = '<div style="color: #28a745;">✓ 正确处理错误</div>'
+    })
+
+    // 测试 4: NumberUnit - 基础功能
+    await runTest('NumberUnit - 基础功能', async (content) => {
+      const number = document.createElement('number-unit')
+      number.setAttribute('value', '1000')
+      number.setAttribute('unit', '元')
+      content.appendChild(number)
+      
+      await new Promise(resolve => setTimeout(resolve, 100))
+      if (!content.textContent.includes('元')) {
+        throw new Error('单位未正确显示')
+      }
+    })
+
+    // 测试 5: NumberUnit - 大数字
+    await runTest('NumberUnit - 大数字格式化', async (content) => {
+      const number = document.createElement('number-unit')
+      number.setAttribute('value', '1234567.89')
+      number.setAttribute('unit', 'kg')
+      content.appendChild(number)
+      
+      await new Promise(resolve => setTimeout(resolve, 100))
+      const text = content.textContent
+      if (!text.includes('kg')) {
+        throw new Error('单位未显示')
+      }
+    })
+
+    // 测试 6: 动态创建多个组件
+    await runTest('动态创建多个组件', async (content) => {
+      const container = document.createElement('div')
+      container.style.display = 'flex'
+      container.style.gap = '10px'
+      container.style.flexWrap = 'wrap'
+      
+      // 创建 3 个 NumberUnit
+      for (let i = 1; i <= 3; i++) {
+        const number = document.createElement('number-unit')
+        number.setAttribute('value', String(i * 1000))
+        number.setAttribute('unit', '元')
+        number.style.padding = '5px 10px'
+        number.style.background = '#f0f0f0'
+        number.style.borderRadius = '4px'
+        container.appendChild(number)
+      }
+      
+      content.appendChild(container)
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      if (container.children.length !== 3) {
+        throw new Error('组件数量不正确')
+      }
+    })
+
+    log('✅ 测试套件执行完成', 'info')
+    log(`总计: ${stats.total} | 通过: ${stats.passed} | 失败: ${stats.failed}`, 'info')
+  </script>
+</body>
+</html>
